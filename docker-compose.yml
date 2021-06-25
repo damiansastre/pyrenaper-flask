@@ -1,0 +1,11 @@
+web:
+  build: .
+  ports:
+   - "5000:5000"
+  volumes:
+    - .:/code
+  environment:
+      FLASK_ENV: development
+      PAQUETE1_API_KEY: ''
+      PAQUETE2_API_KEY: ''
+      PAQUETE3_API_KEY: ''
