@@ -39,6 +39,11 @@ image_encoder_parser.add_argument('front', type=werkzeug.datastructures.FileStor
 image_encoder_parser.add_argument('back', type=werkzeug.datastructures.FileStorage, location='files', required=True)
 image_encoder_parser.add_argument('selfie', type=werkzeug.datastructures.FileStorage, location='files', required=True)
 
+
+sid_parser = reqparse.RequestParser()
+sid_parser.add_argument('front', type=werkzeug.datastructures.FileStorage, location='files', required=True)
+
+
 full_package_one_parser = image_encoder_parser.copy()
 full_package_one_parser.add_argument('browser_fingerprint', type=str, required=True, help='Browser Finger Print')
 

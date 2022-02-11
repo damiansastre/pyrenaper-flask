@@ -1,5 +1,6 @@
 from pyrenaper.models import Selfie
-from utils import call_renaper_api
+from pyrenaper.utils import BarcodeReader
+from utils import call_renaper_api, call_sid_api
 from parsers import *
 from flask_restful import Resource, Api
 from flask import Flask, request
@@ -110,6 +111,7 @@ class FaceLogin(DefaultRenaperView):
         return [args['number'], args['gender'], selfies, args['browser_fingerprint']], {}
 
 
+
 class EncodeImages(Resource):
     parser = image_encoder_parser
     args = None
@@ -201,6 +203,36 @@ class PackageOneView(EncodeImages):
             return scan_barcode_response
 
 
+class SidFullApi(Resource):
+    parser = sid_parser
+    args = None
+
+    def convertImageFormat(self, image):
+        bytes_io_image = BytesIO()
+        image.save(bytes_io_image, 'JPEG')
+        byte_data = bytes_io_image.getvalue()
+        return base64.b64encode(byte_data).decode()
+
+    def _resize(self, image, width, height=None):
+        image = Image.open(image)
+        if not height:
+            wpercent = (width / float(image.size[0]))
+            height = int((float(image.size[1]) * float(wpercent)))
+
+        new_img = image.resize((width, height), Image.ANTIALIAS)
+        return self.convertImageFormat(new_img)
+
+    def post(self):
+        args = self.parser.parse_args()
+        front = self._resize(args['front'], 1200)
+        barcode_reader = BarcodeReader()
+        user_data = barcode_reader.get_barcode_payload(front)
+        return call_sid_api('get_full_person_data', user_data['number'],
+                                                     user_data['gender'],
+                                                     user_data['order'])
+
+
+
 api.add_resource(PersonData, '/person_data')
 api.add_resource(FaceLogin, '/face_login')
 api.add_resource(NewOperation, '/new_operation')
@@ -212,6 +244,7 @@ api.add_resource(ScanBarcode, '/scan_barcode')
 api.add_resource(EndOperation, '/end_operation')
 api.add_resource(EncodeImages, '/encode_images')
 api.add_resource(PackageOneView, '/packageone')
+api.add_resource(SidFullApi, '/sid')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

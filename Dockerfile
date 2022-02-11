@@ -1,4 +1,5 @@
-FROM python:3
+FROM openjdk:slim
+COPY --from=python:3 / /
 WORKDIR /code
 COPY . .
 RUN pip3 install -r requirements.txt
