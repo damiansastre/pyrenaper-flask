@@ -7,10 +7,11 @@ from PIL import Image
 from io import BytesIO
 import json
 import base64
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 api = Api(app)
-
 
 class DefaultRenaperView(Resource):
     parser = None
