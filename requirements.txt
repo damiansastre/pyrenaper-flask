@@ -6,3 +6,4 @@ MarkupSafe==2.0.1
 Werkzeug==2.0.1
 git+https://github.com/tagercito/pyrenaper
 flask-restful
+flask-cors
